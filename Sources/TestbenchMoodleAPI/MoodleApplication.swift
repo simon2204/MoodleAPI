@@ -15,7 +15,7 @@ struct MoodleApplication {
     func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws {
         let itemName = destination.appendingPathComponent(MoodleApplication.submissions)
         let downloadURL = moodleDownloadURL(forId: assignmentId)
-        return try URLSession.shared.downloadTask(with: downloadURL, saveFileTo: itemName)
+        try URLSession.shared.downloadTask(with: downloadURL, saveFileTo: itemName)
     }
     
     private func moodleDownloadURL(forId assignmentId: Int) -> URL {
