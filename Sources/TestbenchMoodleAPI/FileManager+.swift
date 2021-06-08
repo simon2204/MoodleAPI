@@ -18,4 +18,15 @@ extension FileManager {
         let fileExists = FileManager.default.fileExists(atPath: url.path)
         if fileExists { try? FileManager.default.removeItem(at: url) }
     }
+    
+    func contentsOfDirectory(at url: URL) -> [URL] {
+        guard let items = try? contentsOfDirectory(atPath: url.path) else {
+            return []
+        }
+        
+        return items.map { item in
+            url.appendingPathComponent(item)
+        }
+    }
 }
+

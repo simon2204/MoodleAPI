@@ -10,7 +10,7 @@ import Foundation
 
 struct MoodleLogin {
     private let action: URL
-    private let method: Method
+    private let method: HTTPMethod
     private let queryString: String
     
     init(document: Document, username: String, password: String) throws {
@@ -35,7 +35,7 @@ struct MoodleLogin {
             .joined(separator: "&")
         
         self.action = URL(string: action)!
-        self.method = Method(rawValue: method.uppercased()) ?? .post
+        self.method = HTTPMethod(rawValue: method.uppercased()) ?? .post
         self.queryString = queryString
     }
     
@@ -47,7 +47,7 @@ struct MoodleLogin {
         return request
     }
     
-    private enum Method: String {
+    private enum HTTPMethod: String {
         case get = "GET"
         case post = "POST"
     }

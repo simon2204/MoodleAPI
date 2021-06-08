@@ -10,6 +10,7 @@ import SwiftSoup
 
 class MoodleSession {
     private static let session = URLSession.shared
+    
     static let homeURL: URL = "https://moodle.w-hs.de"
     
     let info: MoodleSessionInfo
