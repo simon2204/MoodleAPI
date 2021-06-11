@@ -15,11 +15,11 @@ public struct MoodleApplication {
     
     let session: MoodleSession
     
-    public func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws -> MoodleSubmissionCollection {
+    public func downloadSubmissions(forId assignmentId: Int, to destination: URL) async throws -> MoodleSubmissionCollection {
         let itemName = destination.appendingPathComponent(MoodleApplication.submissions)
         let downloadURL = moodleDownloadURL(forId: assignmentId)
-        try URLSession.shared.downloadTask(with: downloadURL, saveFileTo: itemName)
-        return MoodleSubmissionCollection(zipArchive: itemName)
+        try await URLSession.shared.downloadFile(from: downloadURL, saveTo: itemName)
+        return try MoodleSubmissionCollection(zipArchive: itemName)
     }
     
     private func moodleDownloadURL(forId assignmentId: Int) -> URL {

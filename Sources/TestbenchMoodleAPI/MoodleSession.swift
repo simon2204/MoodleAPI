@@ -35,29 +35,25 @@ public final class MoodleSession {
     /// - Parameters:
     ///   - name: Moodle Benutzername
     ///   - password: Moodle Passwort
-    public init?(name: String, password: String) {
-        guard let info = Self.getMoodleSessionInfo(username: name, password: password) else {
-            return nil
-        }
+    public init(name: String, password: String) async throws {
+        let info = try await Self.getMoodleSessionInfo(username: name, password: password)
         self.info = info
         self.userIsLoggedIn = true
     }
     
-    private static func getMoodleSessionInfo(username: String, password: String) -> MoodleSessionInfo? {
-        guard let loginDocument = try? getLoginDocument(username: username, password: password) else {
-            return nil
-        }
-        return try? MoodleSessionInfo(document: loginDocument)
+    private static func getMoodleSessionInfo(username: String, password: String) async throws -> MoodleSessionInfo {
+        let loginDocument = try await getLoginDocument(username: username, password: password)
+        return try MoodleSessionInfo(document: loginDocument)
     }
     
-    private static func getLoginDocument(username: String, password: String) throws -> Document? {
-        guard let homeDocument = getHomeDocument() else { return nil }
+    private static func getLoginDocument(username: String, password: String) async throws -> Document {
+        let homeDocument = try await getHomeDocument()
         let moodleLogin = try MoodleLogin(document: homeDocument, username: username, password: password)
-        return session.documentTask(with: moodleLogin.request())
+        return try await session.document(with: moodleLogin.request())
     }
     
-    private static func getHomeDocument() -> Document? {
-        return session.documentTask(with: homeURL)
+    private static func getHomeDocument() async throws -> Document {
+        return try await session.document(from: homeURL)
     }
     
     /// Beendigung der Session durch Ausloggen des verwendeten Benutzers.

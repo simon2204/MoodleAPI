@@ -60,8 +60,8 @@ public struct MoodleSubmissionCollection {
     
     private let submissions: [MoodleSubmission]
     
-    init(zipArchive: URL) {
-        submissions = Self.submissions(from: zipArchive)
+    init(zipArchive: URL) throws {
+        submissions = try Self.submissions(from: zipArchive)
     }
     
     /// Anzahl der `MoodleSubmission`s in `MoodleSubmissionCollection`.
@@ -76,9 +76,9 @@ public struct MoodleSubmissionCollection {
         submissions[index]
     }
     
-    private static func submissions(from zippedItem: URL) -> [MoodleSubmission] {
-        guard let unzipped = try? Self.unzip(item: zippedItem) else { return [] }
-        let submissionURLs = getSubmissionURLs(submissionFolder: unzipped)
+    private static func submissions(from zippedItem: URL) throws -> [MoodleSubmission] {
+        let unzipped = try Self.unzip(item: zippedItem)
+        let submissionURLs = try getSubmissionURLs(submissionFolder: unzipped)
         return submissions(from: submissionURLs)
     }
     
@@ -89,13 +89,13 @@ public struct MoodleSubmissionCollection {
         }
     }
     
-    private static func getSubmissionURLs(submissionFolder: URL) -> [URL] {
-        FileManager.default.contentsOfDirectory(at: submissionFolder)
+    private static func getSubmissionURLs(submissionFolder: URL) throws -> [URL] {
+        try FileManager.default.absoulteURLsforContentsOfDirectory(at: submissionFolder)
     }
     
     private static func unzip(item: URL) throws -> URL {
         let unzippedURL = item.deletingPathExtension()
-        FileManager.default.removeExistingFile(unzippedURL)
+        FileManager.default.removeIfFileExists(unzippedURL)
         try FileManager.default.unzipItem(at: item, to: unzippedURL)
         try FileManager.default.removeItem(at: item)
         return unzippedURL
@@ -103,7 +103,7 @@ public struct MoodleSubmissionCollection {
     
     private static func studentName(from item: URL) -> String? {
         let itemName = item.lastPathComponent
-        if let match = itemName.matching(pattern: namePattern) {
+        if let match = itemName.firstMatch(for: namePattern) {
             return String(match)
         }
         return nil

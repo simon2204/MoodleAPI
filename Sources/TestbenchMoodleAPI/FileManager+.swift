@@ -8,21 +8,13 @@
 import Foundation
 
 extension FileManager {
-    func copyItem(at srcURL: URL, to dstURL: URL) -> Error? {
-        do { try self.copyItem(atPath: srcURL.path, toPath: dstURL.path) }
-        catch { return error }
-        return nil
-    }
-    
-    func removeExistingFile(_ url: URL) {
+    func removeIfFileExists(_ url: URL) {
         let fileExists = FileManager.default.fileExists(atPath: url.path)
         if fileExists { try? FileManager.default.removeItem(at: url) }
     }
     
-    func contentsOfDirectory(at url: URL) -> [URL] {
-        guard let items = try? contentsOfDirectory(atPath: url.path) else {
-            return []
-        }
+    func absoulteURLsforContentsOfDirectory(at url: URL) throws -> [URL] {
+        let items = try contentsOfDirectory(atPath: url.path)
         return items.map { url.appendingPathComponent($0) }
     }
 }
