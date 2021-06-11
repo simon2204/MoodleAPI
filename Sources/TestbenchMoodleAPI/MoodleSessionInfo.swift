@@ -21,12 +21,16 @@ struct MoodleSessionInfo {
         let components = URLComponents(string: logOutPath)!
         let logOutURL = components.url!
         
-        guard let sesskey = components.queryItems?.first(where: { $0.name == "sesskey" })?.value else {
+        let queryItems = components.queryItems
+        
+        let sesskey = queryItems?.first(where: \.name, equals: "sesskey")
+        
+        guard let sessionId = sesskey?.value else {
             throw MoodleSessionInfoError.noQueryItem(withName: "sesskey")
         }
         
         self.logOutURL = logOutURL
-        self.sessionId = sesskey
+        self.sessionId = sessionId
     }
     
     enum MoodleSessionInfoError: Error {
