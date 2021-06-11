@@ -9,16 +9,16 @@ import Foundation
 
 extension String {
     func matching(pattern: String) -> Substring? {
-        let range: NSRange = matching(pattern: pattern)
-        if let swiftRange = Range(range, in: self) {
-            return self[swiftRange]
+        let nsRange: NSRange = matching(pattern: pattern)
+        if let range = Range(nsRange, in: self) {
+            return self[range]
         }
         return nil
     }
     
     private func matching(pattern: String) -> NSRange {
-        let range = NSRange(location: 0, length: self.utf16.count)
+        let nsRange = NSRange(location: 0, length: self.utf16.count)
         let regex = try! NSRegularExpression(pattern: pattern)
-        return regex.rangeOfFirstMatch(in: self, options: [], range: range)
+        return regex.rangeOfFirstMatch(in: self, options: [], range: nsRange)
     }
 }

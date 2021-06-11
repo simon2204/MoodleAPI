@@ -23,10 +23,7 @@ extension FileManager {
         guard let items = try? contentsOfDirectory(atPath: url.path) else {
             return []
         }
-        
-        return items.map { item in
-            url.appendingPathComponent(item)
-        }
+        return items.map { url.appendingPathComponent($0) }
     }
 }
 

@@ -7,12 +7,15 @@
 
 import Foundation
 
-struct MoodleApplication {
+/// Herunterladen von Einreichungen in Moodle.
+/// 
+///
+public struct MoodleApplication {
     private static let submissions = "submissions.zip"
     
     let session: MoodleSession
     
-    func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws -> MoodleSubmissionCollection {
+    public func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws -> MoodleSubmissionCollection {
         let itemName = destination.appendingPathComponent(MoodleApplication.submissions)
         let downloadURL = moodleDownloadURL(forId: assignmentId)
         try URLSession.shared.downloadTask(with: downloadURL, saveFileTo: itemName)

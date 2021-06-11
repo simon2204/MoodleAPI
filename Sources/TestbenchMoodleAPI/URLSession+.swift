@@ -8,7 +8,6 @@
 import Foundation
 import SwiftSoup
 
-//  MARK: - documentTask(with url: URL)
 extension URLSession {
     private static let group = DispatchGroup()
     func documentTask(with url: URL) -> Document? {
@@ -17,7 +16,6 @@ extension URLSession {
     }
 }
 
-//  MARK: - documentTask(with request: URLRequest)
 extension URLSession {
     func documentTask(with request: URLRequest) -> Document? {
         guard let html = stringTask(with: request) else { return nil }
@@ -25,7 +23,6 @@ extension URLSession {
     }
 }
 
-//  MARK: - stringTask(with request: URLRequest)
 extension URLSession {
     private func stringTask(with request: URLRequest) -> String? {
         guard let data = dataTask(with: request) else { return nil }
@@ -33,7 +30,6 @@ extension URLSession {
     }
 }
 
-//  MARK: - dataTask(with request: URLRequest)
 extension URLSession {
     private func dataTask(with request: URLRequest) -> Data? {
         var data: Data?
@@ -51,7 +47,6 @@ extension URLSession {
     }
 }
 
-//  MARK: - downloadTask(with url: URL, saveFileTo destination: URL)
 extension URLSession {
     func downloadTask(with url: URL, saveFileTo destination: URL) throws {
         var error: Error?
