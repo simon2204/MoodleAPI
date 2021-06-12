@@ -7,6 +7,9 @@
 
 import Foundation
 import SwiftSoup
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// Ein Objekt welches Zugriff auf die Moodle-Funktionen eines bestimmten Benutzers ermöglicht.
 ///
@@ -38,7 +41,7 @@ public final class MoodleSession {
     public init(name: String, password: String) async throws {
         let info = try await Self.getMoodleSessionInfo(username: name, password: password)
         self.info = info
-        self.userIsLoggedIn = true
+        userIsLoggedIn = true
     }
     
     private static func getMoodleSessionInfo(username: String, password: String) async throws -> MoodleSessionInfo {
@@ -53,7 +56,7 @@ public final class MoodleSession {
     }
     
     private static func getHomeDocument() async throws -> Document {
-        return try await session.document(from: homeURL)
+        try await session.document(from: homeURL)
     }
     
     /// Beendigung der Session durch Ausloggen des verwendeten Benutzers.

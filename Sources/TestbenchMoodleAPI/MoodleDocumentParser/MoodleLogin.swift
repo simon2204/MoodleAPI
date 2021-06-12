@@ -7,6 +7,9 @@
 
 import SwiftSoup
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 struct MoodleLogin {
     private let action: URL

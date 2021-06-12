@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 extension URLResponse {
     func checkForStatusCode(_ statusCode: Int) throws {

@@ -121,6 +121,6 @@ public struct MoodleSubmissionCollection {
 
 extension MoodleSubmissionCollection: Sequence {
     public func makeIterator() -> Array<MoodleSubmission>.Iterator {
-        self.submissions.makeIterator()
+        submissions.makeIterator()
     }
 }
