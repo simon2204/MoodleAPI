@@ -12,13 +12,25 @@ import FoundationNetworking
 
 extension URLResponse {
     func checkForStatusCode(_ statusCode: Int) throws {
-        guard let httpResponse = self as? HTTPURLResponse,
-                httpResponse.statusCode == statusCode else {
+        guard hasStatusCode(200) else {
             throw URLResonseError.invalidServerResponse
         }
     }
     
+    func hasStatusCode(_ statusCode: Int) -> Bool {
+        let httpResonse = self as? HTTPURLResponse
+        return httpResonse?.statusCode == statusCode
+    }
+    
     enum URLResonseError: Error {
         case invalidServerResponse
+    }
+}
+
+extension Optional where Wrapped == URLResponse {
+    func hasStatusCode(_ statusCode: Int) -> Bool {
+        guard let response = self else { return false }
+        let httpResonse = response as? HTTPURLResponse
+        return httpResonse?.statusCode == statusCode
     }
 }

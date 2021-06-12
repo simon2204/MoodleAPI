@@ -44,19 +44,41 @@ public final class MoodleSession {
         userIsLoggedIn = true
     }
     
-    private static func getMoodleSessionInfo(username: String, password: String) async throws -> MoodleSessionInfo {
-        let loginDocument = try await getLoginDocument(username: username, password: password)
-        return try MoodleSessionInfo(document: loginDocument)
+    private static func getMoodleSessionInfo(username: String, password: String, completionHandler: @escaping (MoodleSessionInfo?, Error?) -> Void) {
+        getLoginDocument(username: username, password: password) { document, rError in
+            if let rError = rError {
+                completionHandler(nil, rError)
+            }
+            if let loginDocument = document {
+                do {
+                    let moodleSessionInfo = try MoodleSessionInfo(document: loginDocument)
+                    completionHandler(moodleSessionInfo, nil)
+                } catch {
+                    completionHandler(nil, error)
+                }
+            }
+        }
     }
     
-    private static func getLoginDocument(username: String, password: String) async throws -> Document {
-        let homeDocument = try await getHomeDocument()
-        let moodleLogin = try MoodleLogin(document: homeDocument, username: username, password: password)
-        return try await session.document(with: moodleLogin.request())
+    private static func getLoginDocument(username: String, password: String, completionHandler: @escaping (Document?, Error?) -> Void) {
+        getHomeDocument { document, rError in
+            if let rError = rError {
+                completionHandler(nil, rError)
+            }
+            if let homeDocument = document {
+                do {
+                    let moodleLogin = try MoodleLogin(document: homeDocument, username: username, password: password)
+                    let moodleLoginRequest = moodleLogin.request()
+                    session.document(with: moodleLoginRequest, completionHandler: completionHandler)
+                } catch {
+                    completionHandler(nil, error)
+                }
+            }
+        }
     }
     
-    private static func getHomeDocument() async throws -> Document {
-        try await session.document(from: homeURL)
+    private static func getHomeDocument(completionHandler: @escaping (Document?, Error?) -> Void) {
+        session.document(from: homeURL, completionHandler: completionHandler)
     }
     
     /// Beendigung der Session durch Ausloggen des verwendeten Benutzers.

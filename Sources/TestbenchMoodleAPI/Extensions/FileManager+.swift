@@ -19,3 +19,11 @@ extension FileManager {
     }
 }
 
+extension FileManager {
+    func randomTempDirectory() throws -> URL {
+        let uuid = UUID().uuidString
+        let randomTempDirectory = temporaryDirectory.appendingPathComponent(uuid)
+        try createDirectory(at: temporaryDirectory, withIntermediateDirectories: false)
+        return randomTempDirectory
+    }
+}
