@@ -28,9 +28,19 @@ extension URLResponse {
 }
 
 extension Optional where Wrapped == URLResponse {
+    func checkForStatusCode(_ statusCode: Int) throws {
+        guard hasStatusCode(200) else {
+            throw URLResonseError.invalidServerResponse
+        }
+    }
+    
     func hasStatusCode(_ statusCode: Int) -> Bool {
         guard let response = self else { return false }
         let httpResonse = response as? HTTPURLResponse
         return httpResonse?.statusCode == statusCode
+    }
+    
+    enum URLResonseError: Error {
+        case invalidServerResponse
     }
 }

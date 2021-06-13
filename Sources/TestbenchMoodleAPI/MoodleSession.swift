@@ -38,47 +38,26 @@ public final class MoodleSession {
     /// - Parameters:
     ///   - name: Moodle Benutzername
     ///   - password: Moodle Passwort
-    public init(name: String, password: String) async throws {
-        let info = try await Self.getMoodleSessionInfo(username: name, password: password)
-        self.info = info
+    public init(name: String, password: String) throws {
+        self.info = try Self.getMoodleSessionInfo(username: name, password: password)
         userIsLoggedIn = true
     }
     
-    private static func getMoodleSessionInfo(username: String, password: String, completionHandler: @escaping (MoodleSessionInfo?, Error?) -> Void) {
-        getLoginDocument(username: username, password: password) { document, rError in
-            if let rError = rError {
-                completionHandler(nil, rError)
-            }
-            if let loginDocument = document {
-                do {
-                    let moodleSessionInfo = try MoodleSessionInfo(document: loginDocument)
-                    completionHandler(moodleSessionInfo, nil)
-                } catch {
-                    completionHandler(nil, error)
-                }
-            }
-        }
+    private static func getMoodleSessionInfo(username: String, password: String) throws -> MoodleSessionInfo {
+        let loginDocument = try getLoginDocument(username: username, password: password)
+        let moodleSessionInfo = try MoodleSessionInfo(document: loginDocument)
+        return moodleSessionInfo
     }
     
-    private static func getLoginDocument(username: String, password: String, completionHandler: @escaping (Document?, Error?) -> Void) {
-        getHomeDocument { document, rError in
-            if let rError = rError {
-                completionHandler(nil, rError)
-            }
-            if let homeDocument = document {
-                do {
-                    let moodleLogin = try MoodleLogin(document: homeDocument, username: username, password: password)
-                    let moodleLoginRequest = moodleLogin.request()
-                    session.document(with: moodleLoginRequest, completionHandler: completionHandler)
-                } catch {
-                    completionHandler(nil, error)
-                }
-            }
-        }
+    private static func getLoginDocument(username: String, password: String) throws -> Document {
+        let homeDocument = try getHomeDocument()
+        let moodleLogin = try MoodleLogin(document: homeDocument, username: username, password: password)
+        let moodleLoginRequest = moodleLogin.request()
+        return try session.document(with: moodleLoginRequest)
     }
     
-    private static func getHomeDocument(completionHandler: @escaping (Document?, Error?) -> Void) {
-        session.document(from: homeURL, completionHandler: completionHandler)
+    private static func getHomeDocument() throws -> Document {
+        try session.document(from: homeURL)
     }
     
     /// Beendigung der Session durch Ausloggen des verwendeten Benutzers.

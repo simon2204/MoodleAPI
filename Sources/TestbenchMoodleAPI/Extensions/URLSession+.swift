@@ -12,54 +12,55 @@ import FoundationNetworking
 #endif
 
 extension URLSession {
-    func document(from url: URL, completionHandler: @escaping (Document?, Error?) -> Void) {
+    func document(from url: URL) throws -> Document {
         let request = URLRequest(url: url)
-        document(with: request) { document, rError in
-            if let rError = rError {
-                completionHandler(nil, rError)
-            }
-            if let document = document {
-                completionHandler(document, nil)
-            }
-        }
+        return try document(with: request)
     }
     
-    func document(with request: URLRequest, completionHandler: @escaping (Document?, Error?) -> Void) {
-        string(with: request) { html, rError in
-            if let rError = rError {
-                completionHandler(nil, rError)
-            }
-            if let html = html {
-                do {
-                    let document = try SwiftSoup.parse(html)
-                    completionHandler(document, nil)
-                } catch {
-                    completionHandler(nil, error)
-                }
-            }
-        }
+    func document(with request: URLRequest) throws -> Document {
+        let html = try content(with: request)
+        return try SwiftSoup.parse(html)
+    }
+}
+
+// MARK: - Synchronously downloading content
+extension URLSession {
+    private func content(with request: URLRequest) throws -> String {
+        let data: Data = try synchronousDataTask(with: request)
+        return try String(data: data)
     }
     
-    private func string(with request: URLRequest, completionHandler: @escaping (String?, Error?) -> Void) {
-        let task = URLSession.shared.dataTask(with: request) { data, response, rError in
-            if let rError = rError {
-                completionHandler(nil, rError)
-            }
-            if let data = data, response.hasStatusCode(200) {
-                do {
-                    let string = try String(data: data)
-                    completionHandler(string, nil)
-                } catch {
-                    completionHandler(nil, error)
-                }
-            } else {
-                completionHandler(nil, URLResponse.URLResonseError.invalidServerResponse)
-            }
-        }
-        task.resume()
+    private func synchronousDataTask(with request: URLRequest) throws -> Data {
+        let (data, response, error) = synchronousDataTask(with: request)
+        try error.throwIfNotNil()
+        try response.checkForStatusCode(200)
+        return try data.unwrapped()
     }
     
-    func synchronousDownloadTask(with url: URL, saveTo destination: URL) throws {
+    private func synchronousDataTask(with request: URLRequest) -> (Data?, URLResponse?, Error?) {
+        var data: Data?
+        var response: URLResponse?
+        var error: Error?
+
+        let semaphore = DispatchSemaphore(value: 0)
+
+        let dataTask = self.dataTask(with: request) {
+            data = $0
+            response = $1
+            error = $2
+            semaphore.signal()
+        }
+        dataTask.resume()
+
+        _ = semaphore.wait(timeout: .distantFuture)
+
+        return (data, response, error)
+    }
+}
+
+// MARK: - Synchronously downloading a file
+extension URLSession {
+    func downloadFile(from url: URL, saveTo destination: URL) throws {
         var error: Error?
 
         let semaphore = DispatchSemaphore(value: 0)
@@ -69,15 +70,13 @@ extension URLSession {
             semaphore.signal()
         }
         
-        if let error = error {
-            throw error
-        }
+        try error.throwIfNotNil()
     
         _ = semaphore.wait(timeout: .distantFuture)
     }
         
-    func downloadFile(from url: URL, saveTo destination: URL, completionHandler: @escaping (Error?) -> Void) {
-        let task = URLSession.shared.downloadTask(with: url) { tempFile, response, rError in
+    private func downloadFile(from url: URL, saveTo destination: URL, completionHandler: @escaping (Error?) -> Void) {
+        let task = downloadTask(with: url) { tempFile, response, rError in
             if let rError = rError {
                 completionHandler(rError)
             }
