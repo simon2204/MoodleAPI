@@ -1,5 +1,5 @@
 //
-//  MoodleSubmissionCollection.swift
+//  MoodleSubmissionExtractor.swift
 //  
 //
 //  Created by Simon Schöpke on 08.06.21.
@@ -13,11 +13,11 @@ import ZIPFoundation
 /// ## Überblick
 /// Über Moodle lassen sich Praktikumsaufgaben einreichen und wieder herunterladen, um sie auszuwerten.
 /// Diese Collection von ``MoodleSubmission`` enthält alle eingereichten Praktikumsaufgaben.
-/// `MoodleSubmissionCollection` lässt einen über die einzelnen ``MoodleSubmission``s
+/// `MoodleSubmissionExtractor` lässt einen über die einzelnen ``MoodleSubmission``s
 /// in einer Schleife iterieren oder man verwendet Subscripting um eine bestimmte ``MoodleSubmission``
 /// zu erhalten.
 ///
-/// Eine `MoodleSubmissionCollection` erstellt man nicht selbst, sondern wird durch
+/// Eine `MoodleSubmissionExtractor` erstellt man nicht selbst, sondern wird durch
 /// ``MoodleApplication/downloadSubmissions(forId:to:)`` geliefert. Zum Beispiel:
 /// ```swift
 /// let username = "benutzerName"
@@ -55,29 +55,11 @@ import ZIPFoundation
 /// let lastSubmission = submissions[lastSubmissionIndex]
 /// ```
 ///
-public struct MoodleSubmissionCollection {
+struct MoodleSubmissionExtractor {
     private static let namePattern = ".+?(?=_\\d)"
     
-    private let submissions: [MoodleSubmission]
-    
-    init(zipArchive: URL) throws {
-        submissions = try Self.submissions(from: zipArchive)
-    }
-    
-    /// Anzahl der `MoodleSubmission`s in `MoodleSubmissionCollection`.
-    public var count: Int {
-        submissions.count
-    }
-    
-    /// Zugriff auf eine einzelne `MoodleSubmission`.
-    /// - Parameter index: Position der `MoodleSubmission` in `MoodleSubmissionCollection`.
-    /// - Returns: `MoodleSubmission` an der entsprechenden Position.
-    public subscript(index: Int) -> MoodleSubmission {
-        submissions[index]
-    }
-    
-    private static func submissions(from zippedItem: URL) throws -> [MoodleSubmission] {
-        let unzipped = try Self.unzip(item: zippedItem)
+    static func getSubmissions(from zippedItem: URL) throws -> [MoodleSubmission] {
+        let unzipped = try FileManager.default.unzip(item: zippedItem)
         let submissionURLs = try getSubmissionURLs(submissionFolder: unzipped)
         return submissions(from: submissionURLs)
     }
@@ -93,34 +75,11 @@ public struct MoodleSubmissionCollection {
         try FileManager.default.absoulteURLsforContentsOfDirectory(at: submissionFolder)
     }
     
-    private static func unzip(item: URL) throws -> URL {
-        let unzippedURL = item.deletingPathExtension()
-        FileManager.default.removeIfFileExists(unzippedURL)
-        try FileManager.default.unzipItem(at: item, to: unzippedURL)
-        try FileManager.default.removeItem(at: item)
-        return unzippedURL
-    }
-    
     private static func studentName(from item: URL) -> String? {
         let itemName = item.lastPathComponent
         if let match = itemName.firstMatch(for: namePattern) {
             return String(match)
         }
         return nil
-    }
-    
-    /// Die Einreichung einer Praktikumsaufgabe in Moodle.
-    public struct MoodleSubmission {
-        /// Name der Person, die in Moodle die Praktikumsaufgabe eingereicht hat.
-        public let name: String
-        
-        /// Lokaler Pfad an der sich der Ordner mit den Dokumenten, die eingereicht wurden befindet.
-        public let submission: URL
-    }
-}
-
-extension MoodleSubmissionCollection: Sequence {
-    public func makeIterator() -> Array<MoodleSubmission>.Iterator {
-        submissions.makeIterator()
     }
 }

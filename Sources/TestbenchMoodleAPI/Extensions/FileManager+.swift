@@ -27,3 +27,13 @@ extension FileManager {
         return randomTempDirectory
     }
 }
+
+extension FileManager {
+    func unzip(item: URL) throws -> URL {
+        let unzippedURL = item.deletingPathExtension()
+        FileManager.default.removeIfFileExists(unzippedURL)
+        try FileManager.default.unzipItem(at: item, to: unzippedURL)
+        try FileManager.default.removeItem(at: item)
+        return unzippedURL
+    }
+}

@@ -39,19 +39,19 @@ public final class MoodleSession {
     ///   - name: Moodle Benutzername
     ///   - password: Moodle Passwort
     public init(name: String, password: String) throws {
-        self.info = try Self.getMoodleSessionInfo(username: name, password: password)
+        self.info = try Self.getMoodleSessionInfo(name: name, password: password)
         userIsLoggedIn = true
     }
     
-    private static func getMoodleSessionInfo(username: String, password: String) throws -> MoodleSessionInfo {
-        let loginDocument = try getLoginDocument(username: username, password: password)
+    private static func getMoodleSessionInfo(name: String, password: String) throws -> MoodleSessionInfo {
+        let loginDocument = try getLoginDocument(name: name, password: password)
         let moodleSessionInfo = try MoodleSessionInfo(document: loginDocument)
         return moodleSessionInfo
     }
     
-    private static func getLoginDocument(username: String, password: String) throws -> Document {
+    private static func getLoginDocument(name: String, password: String) throws -> Document {
         let homeDocument = try getHomeDocument()
-        let moodleLogin = try MoodleLogin(document: homeDocument, username: username, password: password)
+        let moodleLogin = try MoodleLogin(document: homeDocument, name: name, password: password)
         let moodleLoginRequest = moodleLogin.request()
         return try session.document(with: moodleLoginRequest)
     }
@@ -62,7 +62,7 @@ public final class MoodleSession {
     
     /// Beendigung der Session durch Ausloggen des verwendeten Benutzers.
     public func logOut() {
-        MoodleSession.session.dataTask(with: info.logOutURL).resume()
+        MoodleSession.session.dataTask(with: info.logoutURL).resume()
         userIsLoggedIn = false
     }
     
