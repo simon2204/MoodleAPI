@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "TestbenchMoodleAPI",
-    platforms: [.macOS(.v10_11)],
+    platforms: [.macOS(.v10_12)],
     products: [
         .library(name: "TestbenchMoodleAPI", targets: ["TestbenchMoodleAPI"])
     ],

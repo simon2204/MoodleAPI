@@ -6,20 +6,23 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// Herunterladen von Einreichungen in Moodle.
 /// 
 ///
 public struct MoodleApplication {
-    private static let submissions = "submissions.zip"
+    private static let zipFileName = "submissions.zip"
     
     let session: MoodleSession
     
-    public func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws -> MoodleSubmissionCollection {
-        let itemName = destination.appendingPathComponent(MoodleApplication.submissions)
+    public func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws -> [MoodleSubmission] {
+        let itemName = destination.appendingPathComponent(MoodleApplication.zipFileName)
         let downloadURL = moodleDownloadURL(forId: assignmentId)
-        try URLSession.shared.downloadTask(with: downloadURL, saveFileTo: itemName)
-        return MoodleSubmissionCollection(zipArchive: itemName)
+        try URLSession.shared.downloadFile(from: downloadURL, saveTo: itemName)
+        return try MoodleSubmissionExtractor.getSubmissions(from: itemName)
     }
     
     private func moodleDownloadURL(forId assignmentId: Int) -> URL {

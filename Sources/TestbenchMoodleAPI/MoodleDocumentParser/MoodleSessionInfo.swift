@@ -9,7 +9,7 @@ import Foundation
 import SwiftSoup
 
 struct MoodleSessionInfo {
-    let logOutURL: URL
+    let logoutURL: URL
     let sessionId: String
     
     init(document: Document) throws {
@@ -17,16 +17,20 @@ struct MoodleSessionInfo {
             throw MoodleSessionInfoError.noSuchElement(withCSSSelector: "a[href*=logout.php]")
         }
         
-        let logOutPath = try logoutElement.attr("href")
-        let components = URLComponents(string: logOutPath)!
-        let logOutURL = components.url!
+        let logoutPath = try logoutElement.attr("href")
+        let components = URLComponents(string: logoutPath)!
+        let logoutURL = components.url!
         
-        guard let sesskey = components.queryItems?.first(where: { $0.name == "sesskey" })?.value else {
+        let queryItems = components.queryItems
+        
+        let sesskey = queryItems?.first(where: \.name, equals: "sesskey")
+        
+        guard let sessionId = sesskey?.value else {
             throw MoodleSessionInfoError.noQueryItem(withName: "sesskey")
         }
         
-        self.logOutURL = logOutURL
-        self.sessionId = sesskey
+        self.logoutURL = logoutURL
+        self.sessionId = sessionId
     }
     
     enum MoodleSessionInfoError: Error {

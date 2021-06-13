@@ -7,13 +7,16 @@
 
 import SwiftSoup
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 struct MoodleLogin {
     private let action: URL
     private let method: HTTPMethod
     private let queryString: String
     
-    init(document: Document, username: String, password: String) throws {
+    init(document: Document, name: String, password: String) throws {
         guard let loginform = try document.getElementById("login") else {
             throw LoginFormError.noElement(withId: "login")
         }
@@ -24,7 +27,7 @@ struct MoodleLogin {
         let method = try loginform.attr("method")
          
         let parameters = [
-            "username": username,
+            "username": name,
             "password": password,
             "rememberusername": "0",
             "logintoken": logintoken

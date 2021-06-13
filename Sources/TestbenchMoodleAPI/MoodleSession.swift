@@ -7,6 +7,9 @@
 
 import Foundation
 import SwiftSoup
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// Ein Objekt welches Zugriff auf die Moodle-Funktionen eines bestimmten Benutzers ermöglicht.
 ///
@@ -35,34 +38,31 @@ public final class MoodleSession {
     /// - Parameters:
     ///   - name: Moodle Benutzername
     ///   - password: Moodle Passwort
-    public init?(name: String, password: String) {
-        guard let info = Self.getMoodleSessionInfo(username: name, password: password) else {
-            return nil
-        }
-        self.info = info
-        self.userIsLoggedIn = true
+    public init(name: String, password: String) throws {
+        self.info = try Self.getMoodleSessionInfo(name: name, password: password)
+        userIsLoggedIn = true
     }
     
-    private static func getMoodleSessionInfo(username: String, password: String) -> MoodleSessionInfo? {
-        guard let loginDocument = try? getLoginDocument(username: username, password: password) else {
-            return nil
-        }
-        return try? MoodleSessionInfo(document: loginDocument)
+    private static func getMoodleSessionInfo(name: String, password: String) throws -> MoodleSessionInfo {
+        let loginDocument = try getLoginDocument(name: name, password: password)
+        let moodleSessionInfo = try MoodleSessionInfo(document: loginDocument)
+        return moodleSessionInfo
     }
     
-    private static func getLoginDocument(username: String, password: String) throws -> Document? {
-        guard let homeDocument = getHomeDocument() else { return nil }
-        let moodleLogin = try MoodleLogin(document: homeDocument, username: username, password: password)
-        return session.documentTask(with: moodleLogin.request())
+    private static func getLoginDocument(name: String, password: String) throws -> Document {
+        let homeDocument = try getHomeDocument()
+        let moodleLogin = try MoodleLogin(document: homeDocument, name: name, password: password)
+        let moodleLoginRequest = moodleLogin.request()
+        return try session.document(with: moodleLoginRequest)
     }
     
-    private static func getHomeDocument() -> Document? {
-        return session.documentTask(with: homeURL)
+    private static func getHomeDocument() throws -> Document {
+        try session.document(from: homeURL)
     }
     
     /// Beendigung der Session durch Ausloggen des verwendeten Benutzers.
     public func logOut() {
-        MoodleSession.session.dataTask(with: info.logOutURL).resume()
+        MoodleSession.session.dataTask(with: info.logoutURL).resume()
         userIsLoggedIn = false
     }
     
