@@ -1,1 +1,1 @@
-# TestbenchMoodleAPI
+# MoodleAPI
