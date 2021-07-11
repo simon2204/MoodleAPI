@@ -4,10 +4,10 @@
 import PackageDescription
 
 let package = Package(
-    name: "TestbenchMoodleAPI",
+    name: "MoodleAPI",
     platforms: [.macOS(.v10_12)],
     products: [
-        .library(name: "TestbenchMoodleAPI", targets: ["TestbenchMoodleAPI"])
+        .library(name: "MoodleAPI", targets: ["MoodleAPI"])
     ],
     dependencies: [
         .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.3.2"),
@@ -15,10 +15,10 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "TestbenchMoodleAPI",
+            name: "MoodleAPI",
             dependencies: ["SwiftSoup", "ZIPFoundation"]),
         .testTarget(
-            name: "TestbenchMoodleAPITests",
-            dependencies: ["TestbenchMoodleAPI"]),
+            name: "MoodleAPITests",
+            dependencies: ["MoodleAPI"]),
     ]
 )
