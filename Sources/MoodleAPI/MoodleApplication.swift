@@ -19,7 +19,11 @@ public struct MoodleApplication {
     
     private static let zipFileName = "submissions.zip"
     
-    let session: MoodleSession
+    private let session: MoodleSession
+    
+    public init(session: MoodleSession) {
+        self.session = session
+    }
     
     public func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws -> [MoodleSubmission] {
         let itemName = destination.appendingPathComponent(Self.zipFileName)

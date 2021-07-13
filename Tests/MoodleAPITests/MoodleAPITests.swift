@@ -1,6 +1,6 @@
 import XCTest
 import class Foundation.Bundle
-@testable import MoodleAPI
+import MoodleAPI
 
 final class MoodleAPITests: XCTestCase {
     func testExample() async throws {
