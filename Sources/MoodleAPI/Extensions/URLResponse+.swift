@@ -12,7 +12,7 @@ import FoundationNetworking
 
 extension URLResponse {
     func checkForStatusCode(_ statusCode: Int) throws {
-        guard hasStatusCode(200) else {
+        guard hasStatusCode(statusCode) else {
             throw URLResonseError.invalidServerResponse
         }
     }
@@ -29,7 +29,7 @@ extension URLResponse {
 
 extension Optional where Wrapped == URLResponse {
     func checkForStatusCode(_ statusCode: Int) throws {
-        guard hasStatusCode(200) else {
+        guard hasStatusCode(statusCode) else {
             throw URLResonseError.invalidServerResponse
         }
     }

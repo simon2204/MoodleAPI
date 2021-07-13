@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "FormData",
+        "repositoryURL": "https://github.com/simon2204/FormData.git",
+        "state": {
+          "branch": "main",
+          "revision": "4b6c60a46c1ee20f6df7a70aee982cd822b0eac3",
+          "version": null
+        }
+      },
+      {
         "package": "SwiftSoup",
         "repositoryURL": "https://github.com/scinfu/SwiftSoup.git",
         "state": {
