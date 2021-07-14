@@ -33,7 +33,7 @@ extension URLSession {
     private func synchronousDataTask(with request: URLRequest) throws -> Data {
         let (data, response, error) = synchronousDataTask(with: request)
         try error.throwIfNotNil()
-        try response.checkForStatusCode(200)
+        try response.checkForStatusCode(200...299)
         return try data.unwrapped()
     }
     
@@ -52,7 +52,7 @@ extension URLSession {
         }
         dataTask.resume()
 
-        _ = semaphore.wait(timeout: .distantFuture)
+        semaphore.wait()
 
         return (data, response, error)
     }
@@ -80,7 +80,7 @@ extension URLSession {
             if let rError = rError {
                 completionHandler(rError)
             }
-            if let tempFile = tempFile, response.hasStatusCode(200) {
+            if let tempFile = tempFile, response.hasStatusCode(200...299) {
                 FileManager.default.removeIfFileExists(destination)
                 do {
                     try FileManager.default.moveItem(at: tempFile, to: destination)

@@ -11,15 +11,15 @@ import FoundationNetworking
 #endif
 
 extension URLResponse {
-    func checkForStatusCode(_ statusCode: Int) throws {
+    func checkForStatusCode<Code: Sequence>(_ statusCode: Code) throws where Code.Element == Int {
         guard hasStatusCode(statusCode) else {
             throw URLResonseError.invalidServerResponse
         }
     }
     
-    func hasStatusCode(_ statusCode: Int) -> Bool {
-        let httpResonse = self as? HTTPURLResponse
-        return httpResonse?.statusCode == statusCode
+    func hasStatusCode<Code: Sequence>(_ statusCode: Code) -> Bool where Code.Element == Int {
+        guard let httpResonse = self as? HTTPURLResponse else { return false }
+        return statusCode.contains(httpResonse.statusCode)
     }
     
     enum URLResonseError: Error {
@@ -28,16 +28,16 @@ extension URLResponse {
 }
 
 extension Optional where Wrapped == URLResponse {
-    func checkForStatusCode(_ statusCode: Int) throws {
+    func checkForStatusCode<Code: Sequence>(_ statusCode: Code) throws where Code.Element == Int {
         guard hasStatusCode(statusCode) else {
             throw URLResonseError.invalidServerResponse
         }
     }
     
-    func hasStatusCode(_ statusCode: Int) -> Bool {
-        guard let response = self else { return false }
-        let httpResonse = response as? HTTPURLResponse
-        return httpResonse?.statusCode == statusCode
+    func hasStatusCode<Code: Sequence>(_ statusCode: Code) -> Bool where Code.Element == Int {
+        guard let response = self,
+            let httpResonse = response as? HTTPURLResponse else { return false }
+        return statusCode.contains(httpResonse.statusCode)
     }
     
     enum URLResonseError: Error {

@@ -72,7 +72,7 @@ public struct MoodleApplication {
     }
     
     private func uploadResponses(repoID: String, itemID: String, zippedItem: File) throws {
-        let formdata = FormData()
+        var formdata = FormData()
         formdata.add(value: "upload", forKey: "action")
         formdata.add(value: session.info.sessionId, forKey: "sesskey")
         formdata.add(value: repoID, forKey: "repo_id")
@@ -85,7 +85,7 @@ public struct MoodleApplication {
     }
     
     private func importResponses(itemID: String, assignmentID: Int) throws {
-        let urldata = UrlEncodedData()
+        var urldata = UrlEncodedData()
         urldata.add(value: String(assignmentID), forKey: "id")
         urldata.add(value: "viewpluginpage", forKey: "action")
         urldata.add(value: "uploadzip", forKey: "pluginaction")
@@ -101,7 +101,7 @@ public struct MoodleApplication {
     }
     
     public func confirmResponses(forId assignmentId: Int) throws {
-        let urldata = UrlEncodedData()
+        var urldata = UrlEncodedData()
         urldata.add(value: String(assignmentId), forKey: "id")
         urldata.add(value: "viewpluginpage", forKey: "action")
         urldata.add(value: "true", forKey: "confirm")
