@@ -32,8 +32,8 @@ public struct MoodleApplication {
         return try MoodleSubmissionExtractor.getSubmissions(from: itemName)
     }
     
-    public func uploadFeedbackZIP(forId assignmentId: Int, from source: URL) throws {
-        let file = try File(url: source, contentType: .zip)
+    public func uploadFeedback(forId assignmentId: Int, from directory: URL) throws {
+        let file = try File.zipped(from: directory)
         let data = try moodleData(forId: assignmentId)
         try uploadResponses(repoID: data.repoID, itemID: data.itemID, zippedItem: file)
         try importResponses(itemID: data.itemID, assignmentID: assignmentId)
