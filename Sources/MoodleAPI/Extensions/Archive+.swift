@@ -9,7 +9,7 @@ import ZIPFoundation
 import Foundation
 
 extension Archive {
-    static func createData(from directory: URL) throws -> Data {
+    static func createCompressedData(from directory: URL) throws -> Data {
         guard let archive = try Archive(item: directory) else {
             throw ArchiveError.couldNotCreateArchive
         }
@@ -25,18 +25,17 @@ extension Archive {
         self.init(accessMode: .create)
         let name = item.lastPathComponent
         let baseURL = item.deletingLastPathComponent()
-        try add(item: name, relativeTo: baseURL)
+        try addItem(itemPath: name, relativeTo: baseURL)
     }
     
-    private func add(item: String, relativeTo baseURL: URL) throws {
-        try self.addEntry(with: item, relativeTo: baseURL, compressionMethod: .deflate)
-        let fileManager = FileManager.default
-        let absolute = baseURL.appendingPathComponent(item)
-        if absolute.hasDirectoryPath {
-            let items = try fileManager.contentsOfDirectory(atPath: absolute.path)
-            let relativeItemPaths = items.map { "\(item)/\($0)" }
+    private func addItem(itemPath: String, relativeTo baseURL: URL) throws {
+        try self.addEntry(with: itemPath, relativeTo: baseURL, compressionMethod: .deflate)
+        let itemUrl = baseURL.appendingPathComponent(itemPath)
+        if itemUrl.hasDirectoryPath {
+            let items = try FileManager.default.contentsOfDirectory(atPath: itemUrl.path)
+            let relativeItemPaths = items.lazy.map { "\(itemPath)/\($0)" }
             for relativeItemPath in relativeItemPaths {
-                try self.add(item: relativeItemPath, relativeTo: baseURL)
+                try self.addItem(itemPath: relativeItemPath, relativeTo: baseURL)
             }
         }
     }

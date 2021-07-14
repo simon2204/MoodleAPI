@@ -12,7 +12,7 @@ import FormData
 extension File {
     static func zipped(from directory: URL) throws -> File {
         let zipName = directory.lastPathComponent + ".zip"
-        let archiveData = try Archive.createData(from: directory)
+        let archiveData = try Archive.createCompressedData(from: directory)
         return File(name: zipName, content: archiveData, contentType: .zip)
     }
 }
