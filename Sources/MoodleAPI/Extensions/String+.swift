@@ -22,11 +22,11 @@ extension String {
             range: range
         )
         
-        guard let match = match else {
+        guard let m = match else {
             throw MatchError.noMatchFound(forPattern: pattern)
         }
         
-        let matchRange = match.range(at: 1)
+        let matchRange = m.range(at: 1)
         
         // Extract the substring matching the capture group
         guard let substringRange = Range(matchRange, in: self) else {
