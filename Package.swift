@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "MoodleAPI",
-    platforms: [.macOS(.v10_11)],
+    platforms: [.macOS(.v10_12)],
     products: [
         .library(name: "MoodleAPI", targets: ["MoodleAPI"])
     ],
