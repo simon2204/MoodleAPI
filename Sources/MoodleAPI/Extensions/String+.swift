@@ -59,7 +59,7 @@ extension String {
 extension String {
     init(data: Data) throws {
         guard let string = String(data: data, encoding: .utf8) else {
-            throw String.StringError.invalidEncoding
+            throw StringError.invalidEncoding
         }
         self = string
     }
