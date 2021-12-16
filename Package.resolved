@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "FormData",
-        "repositoryURL": "https://github.com/simon2204/FormData.git",
+        "repositoryURL": "https://pi-lab3.w-hs.de/Simon/FormData.git",
         "state": {
-          "branch": "main",
-          "revision": "3bba617dfb1277ecdb90e29d3a8c6b2d125066d3",
-          "version": null
+          "branch": null,
+          "revision": "4dc461814b181274d12d8b926e14cb3e1e14f1ee",
+          "version": "2.0.2"
         }
       },
       {

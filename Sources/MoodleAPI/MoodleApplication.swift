@@ -25,19 +25,19 @@ public struct MoodleApplication {
         self.session = session
     }
     
-    public func downloadSubmissions(forId assignmentId: Int, to destination: URL) throws -> [MoodleSubmission] {
+    public func downloadSubmissions(forId assignmentId: Int, to destination: URL) async throws -> [MoodleSubmission] {
         let itemName = destination.appendingPathComponent(Self.zipFileName)
         let downloadURL = moodleDownloadURL(forId: assignmentId)
-        try URLSession.shared.downloadFile(from: downloadURL, saveTo: itemName)
+        try await URLSession.shared.download(from: downloadURL, saveTo: itemName)
         return try MoodleSubmissionExtractor.getSubmissions(from: itemName)
     }
     
-    public func uploadFeedback(forId assignmentId: Int, from directory: URL) throws {
+    public func uploadFeedback(forId assignmentId: Int, from directory: URL) async throws {
         let file = try File.zipped(from: directory)
         let data = try moodleData(forId: assignmentId)
-        try uploadResponses(repoID: data.repoID, itemID: data.itemID, zippedItem: file)
-        try importResponses(itemID: data.itemID, assignmentID: assignmentId)
-        try confirmResponses(forId: assignmentId)
+        try await uploadResponses(repoID: data.repoID, itemID: data.itemID, zippedItem: file)
+        try await importResponses(itemID: data.itemID, assignmentID: assignmentId)
+        try await confirmResponses(forId: assignmentId)
     }
     
     private func moodleDownloadURL(forId assignmentId: Int) -> URL {
@@ -71,36 +71,36 @@ public struct MoodleApplication {
         return (String(repoID), String(itemID))
     }
     
-    private func uploadResponses(repoID: String, itemID: String, zippedItem: File) throws {
+    private func uploadResponses(repoID: String, itemID: String, zippedItem: File) async throws {
         var formdata = FormData()
         formdata.add(value: "upload", forKey: "action")
-        formdata.add(value: session.info.sessionId, forKey: "sesskey")
+        formdata.add(value: session.info!.sessionId, forKey: "sesskey")
         formdata.add(value: repoID, forKey: "repo_id")
         formdata.add(value: itemID, forKey: "itemid")
         formdata.add(value: "ppr ppr", forKey: "author")
         formdata.add(value: zippedItem.name, forKey: "title")
         formdata.add(file: zippedItem, forKey: "repo_upload_file")
         let uploadURL = MoodleSession.homeURL.appendingPathComponent("repository/repository_ajax.php")
-        try formdata.post(to: uploadURL)
+        try await formdata.post(to: uploadURL)
     }
     
-    private func importResponses(itemID: String, assignmentID: Int) throws {
+    private func importResponses(itemID: String, assignmentID: Int) async throws {
         var urldata = UrlEncodedData()
         urldata.add(value: String(assignmentID), forKey: "id")
         urldata.add(value: "viewpluginpage", forKey: "action")
         urldata.add(value: "uploadzip", forKey: "pluginaction")
         urldata.add(value: "file", forKey: "plugin")
         urldata.add(value: "assignfeedback", forKey: "pluginsubtype")
-        urldata.add(value: session.info.sessionId, forKey: "sesskey")
+        urldata.add(value: session.info!.sessionId, forKey: "sesskey")
         urldata.add(value: "1", forKey: "_qf__assignfeedback_file_upload_zip_form")
         urldata.add(value: "1", forKey: "mform_isexpanded_id_uploadzip")
         urldata.add(value: itemID, forKey: "feedbackzip")
         urldata.add(value: "Feedbackdatei(en) importieren", forKey: "submitbutton")
         let uploadURL = MoodleSession.homeURL.appendingPathComponent("mod/assign/view.php")
-        try urldata.post(to: uploadURL)
+        try await urldata.post(to: uploadURL)
     }
     
-    public func confirmResponses(forId assignmentId: Int) throws {
+    private func confirmResponses(forId assignmentId: Int) async throws {
         var urldata = UrlEncodedData()
         urldata.add(value: String(assignmentId), forKey: "id")
         urldata.add(value: "viewpluginpage", forKey: "action")
@@ -108,10 +108,10 @@ public struct MoodleApplication {
         urldata.add(value: "file", forKey: "plugin")
         urldata.add(value: "assignfeedback", forKey: "pluginsubtype")
         urldata.add(value: "uploadzip", forKey: "pluginaction")
-        urldata.add(value: session.info.sessionId, forKey: "sesskey")
+        urldata.add(value: session.info!.sessionId, forKey: "sesskey")
         urldata.add(value: "1", forKey: "_qf__assignfeedback_file_upload_zip_form")
         urldata.add(value: "1", forKey: "mform_isexpanded_id_uploadzip")
         let uploadURL = MoodleSession.homeURL.appendingPathComponent("mod/assign/view.php")
-        try urldata.post(to: uploadURL)
+        try await urldata.post(to: uploadURL)
     }
 }

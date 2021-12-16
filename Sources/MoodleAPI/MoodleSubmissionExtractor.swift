@@ -1,12 +1,13 @@
 //
 //  MoodleSubmissionExtractor.swift
-//  
+//
 //
 //  Created by Simon Schöpke on 08.06.21.
 //
 
 import Foundation
 import ZIPFoundation
+import FormData
 
 /// Ansammlung von Einreichungen einer Praktikumsaufgabe in Moodle.
 ///
@@ -61,13 +62,15 @@ struct MoodleSubmissionExtractor {
     static func getSubmissions(from zippedItem: URL) throws -> [MoodleSubmission] {
         let unzipped = try FileManager.default.unzip(item: zippedItem)
         let submissionURLs = try getSubmissionURLs(submissionFolder: unzipped)
-        return submissions(from: submissionURLs)
+        return try submissions(from: submissionURLs)
     }
     
-    private static func submissions(from urls: [URL]) -> [MoodleSubmission] {
-        urls.compactMap { url in
+    private static func submissions(from urls: [URL]) throws -> [MoodleSubmission] {
+        try urls.compactMap { url in
             guard let studentName = Self.studentName(from: url) else { return nil }
-            return MoodleSubmission(name: studentName, submission: url)
+            let fileURLs = try FileManager.default.filesAtDirectory(url)
+            let files = try fileURLs.map { try File(url: $0, contentType: .octetStream) }
+            return MoodleSubmission(name: studentName, path: url, files: files)
         }
     }
     

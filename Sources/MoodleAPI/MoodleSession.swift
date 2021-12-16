@@ -30,39 +30,44 @@ public final class MoodleSession {
     
     static let homeURL: URL = "https://moodle.w-hs.de"
     
-    let info: MoodleSessionInfo
+    var info: MoodleSessionInfo!
     
-    private var userIsLoggedIn: Bool
+    private var userIsLoggedIn: Bool = false
     
-    /// Erstellt eine neue `MoodleSession` mit einem gültigen Benutzernamen und Passwort.
-    /// - Parameters:
-    ///   - name: Moodle Benutzername
-    ///   - password: Moodle Passwort
-    public init(name: String, password: String) throws {
-        self.info = try Self.getMoodleSessionInfo(name: name, password: password)
-        userIsLoggedIn = true
+    public init() {
+        
     }
+	
+	/// - Parameters:
+	///   - name: Moodle Benutzername
+	///   - password: Moodle Passwort
+	public func login(name: String, password: String) async throws {
+		self.info = try await Self.getMoodleSessionInfo(name: name, password: password)
+		userIsLoggedIn = true
+	}
     
-    private static func getMoodleSessionInfo(name: String, password: String) throws -> MoodleSessionInfo {
-        let loginDocument = try getLoginDocument(name: name, password: password)
+    private static func getMoodleSessionInfo(name: String, password: String) async throws -> MoodleSessionInfo {
+        let loginDocument = try await getLoginDocument(name: name, password: password)
         let moodleSessionInfo = try MoodleSessionInfo(document: loginDocument)
         return moodleSessionInfo
     }
     
-    private static func getLoginDocument(name: String, password: String) throws -> Document {
-        let homeDocument = try getHomeDocument()
+    private static func getLoginDocument(name: String, password: String) async throws -> Document {
+        let homeDocument = try await getHomeDocument()
         let moodleLogin = try MoodleLogin(document: homeDocument, name: name, password: password)
         let moodleLoginRequest = moodleLogin.request()
-        return try session.document(with: moodleLoginRequest)
+        return try await session.document(with: moodleLoginRequest)
     }
     
-    private static func getHomeDocument() throws -> Document {
-        try session.document(from: homeURL)
+    private static func getHomeDocument() async throws -> Document {
+        try await session.document(from: homeURL)
     }
     
     /// Beendigung der Session durch Ausloggen des verwendeten Benutzers.
     public func logOut() {
-        MoodleSession.session.dataTask(with: info.logoutURL).resume()
+		if let info = info {
+			MoodleSession.session.dataTask(with: info.logoutURL).resume()
+		}
         userIsLoggedIn = false
     }
     

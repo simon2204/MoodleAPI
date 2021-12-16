@@ -33,7 +33,7 @@ extension Archive {
         let itemUrl = baseURL.appendingPathComponent(itemPath)
         if itemUrl.hasDirectoryPath {
             let items = try FileManager.default.contentsOfDirectory(atPath: itemUrl.path)
-            let relativeItemPaths = items.lazy.map { "\(itemPath)/\($0)" }
+            let relativeItemPaths = items.map { "\(itemPath)/\($0)" }
             for relativeItemPath in relativeItemPaths {
                 try self.addItem(itemPath: relativeItemPath, relativeTo: baseURL)
             }

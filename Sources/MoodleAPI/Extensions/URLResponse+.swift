@@ -17,7 +17,7 @@ extension URLResponse {
         }
     }
     
-    func hasStatusCode<Code: Sequence>(_ statusCode: Code) -> Bool where Code.Element == Int {
+    private func hasStatusCode<Code: Sequence>(_ statusCode: Code) -> Bool where Code.Element == Int {
         guard let httpResonse = self as? HTTPURLResponse else { return false }
         return statusCode.contains(httpResonse.statusCode)
     }
@@ -34,7 +34,7 @@ extension Optional where Wrapped == URLResponse {
         }
     }
     
-    func hasStatusCode<Code: Sequence>(_ statusCode: Code) -> Bool where Code.Element == Int {
+    private func hasStatusCode<Code: Sequence>(_ statusCode: Code) -> Bool where Code.Element == Int {
         guard let response = self,
             let httpResonse = response as? HTTPURLResponse else { return false }
         return statusCode.contains(httpResonse.statusCode)
