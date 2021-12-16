@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "FormData",
-        "repositoryURL": "https://pi-lab3.w-hs.de/Simon/FormData.git",
+        "repositoryURL": "https://github.com/simon2204/FormData.git",
         "state": {
           "branch": null,
-          "revision": "4dc461814b181274d12d8b926e14cb3e1e14f1ee",
-          "version": "2.0.2"
+          "revision": "e3bfdc0e5ceaeab6ea823a9031d7c3e903a6970d",
+          "version": "1.0.0"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/scinfu/SwiftSoup.git",
         "state": {
           "branch": null,
-          "revision": "774dc9c7213085db8aa59595e27c1cd22e428904",
-          "version": "2.3.2"
+          "revision": "3fa09f4d79e5172b14cb50e02f1d5f115a2bbaef",
+          "version": "2.3.4"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/weichsel/ZIPFoundation.git",
         "state": {
           "branch": null,
-          "revision": "cf10bbff6ac3b873e97b36b9784c79866a051a8e",
-          "version": "0.9.12"
+          "revision": "7254c74b49cec2cb81520523ba993c671f71b066",
+          "version": "0.9.14"
         }
       }
     ]
